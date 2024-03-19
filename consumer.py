@@ -1,12 +1,15 @@
 import json
+import redis
 
-from rabbit import Rabbit
+from services.rabbit import Rabbit
 
-from processor import Process
-from entities import Sensor
+from services.sensor_processor import Process
+from config.reader import rabbit_settings, redis_settings
+from entities.sensor import Sensor
 
-rabbit = Rabbit()
-processor = Process()
+
+rabbit = Rabbit(rabbit_settings.host)
+processor = Process(redis.StrictRedis(host=redis_settings.host, port=redis_settings.port, db=redis_settings.db))
 
 
 def callback(ch, method, properties, body):

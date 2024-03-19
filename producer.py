@@ -3,11 +3,12 @@ import random
 import time
 import pika
 
-from rabbit import Rabbit
-from entities import Sensor
+from services.rabbit import Rabbit
+from entities.sensor import Sensor
 from dataclasses import asdict
+from config.reader import rabbit_settings
 
-rabbit = Rabbit()
+rabbit = Rabbit(rabbit_settings.host)
 
 
 def send_sensor_value(sensor: Sensor, queue: str = 'sensors', routing_key: str = 'sensors') -> None:

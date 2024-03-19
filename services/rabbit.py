@@ -3,7 +3,7 @@ from pika.exceptions import AMQPConnectionError
 
 
 class Rabbit:
-    def __init__(self, host: str = 'rabbitmq') -> None:
+    def __init__(self, host: str) -> None:
         while True:
             try:
                 connection = pika.BlockingConnection(pika.ConnectionParameters(host))

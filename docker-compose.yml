@@ -24,32 +24,40 @@ services:
   producer:
     container_name: producer
     build: .
-    command: python sensors/producer.py
+    command: python producer.py
     depends_on:
       - redis
       - rabbitmq
     networks:
       - services
+    environment:
+      - REDIS_HOST=redis
+      - RABBIT_HOST=rabbitmq
 
   consumer:
     container_name: consumer
     build: .
-    command: python sensors/consumer.py
+    command: python consumer.py
     depends_on:
       - redis
       - rabbitmq
       - producer
     networks:
       - services
+    environment:
+      - REDIS_HOST=redis
+      - RABBIT_HOST=rabbitmq
 
   backend:
     build: .
     ports:
       - "8000:8000"
     container_name: backend
-    command: uvicorn backend.core.main:app --host 0.0.0.0 --port 8000
+    command: uvicorn server:app --host 0.0.0.0 --port 8000
     networks:
       - services
+    environment:
+      - REDIS_HOST=redis
 
 networks:
   services:

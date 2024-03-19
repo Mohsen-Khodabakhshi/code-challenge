@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from backend.core.config import redis_settings
+from config.reader import redis_settings
 
 import redis
 
