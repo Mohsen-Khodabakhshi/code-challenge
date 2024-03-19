@@ -1,33 +1,20 @@
-import pika
-import redis
+from rabbit import Rabbit
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
+from processor import Process
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
-
-
-def cache_last_sensor_value(sensor_value: int):
-    redis_client.set('sensor', sensor_value)
-
-
-def some_process(sensor_value: str):
-    sensor_value = int(sensor_value)
-    sensor_value += 1
-    return sensor_value
+rabbit = Rabbit()
+processor = Process()
 
 
 def callback(ch, method, properties, body):
-    sensor_value = some_process(body)
-    cache_last_sensor_value(sensor_value)
+    sensor_value = processor.change_sensor_value(body)
+    processor.cache_sensor_value(sensor_value)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == "__main__":
-    channel.queue_declare(queue='sensors', durable=True)
-
-    channel.basic_consume(queue='sensors',
-                          on_message_callback=callback,
-                          auto_ack=False)
-
-    channel.start_consuming()
+    rabbit.channel.queue_declare(queue='sensors', durable=True)
+    rabbit.channel.basic_consume(queue='sensors',
+                                 on_message_callback=callback,
+                                 auto_ack=False)
+    rabbit.channel.start_consuming()

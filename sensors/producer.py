@@ -1,16 +1,16 @@
 import random
 import time
-
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
+from rabbit import Rabbit
+
+rabbit = Rabbit()
 
 
 def send_sensor_value(value: int, queue: str = 'sensors', routing_key: str = 'sensors') -> None:
-    channel.queue_declare(queue=queue, durable=True)
+    rabbit.channel.queue_declare(queue, True)
 
-    channel.basic_publish(exchange='', routing_key=routing_key, body=str(value), properties=pika.BasicProperties(
+    rabbit.channel.basic_publish(exchange='', routing_key=routing_key, body=str(value), properties=pika.BasicProperties(
         delivery_mode=2,
     ))
 
