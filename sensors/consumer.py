@@ -1,14 +1,19 @@
+import json
+
 from rabbit import Rabbit
 
 from processor import Process
+from entities import Sensor
 
 rabbit = Rabbit()
 processor = Process()
 
 
 def callback(ch, method, properties, body):
-    sensor_value = processor.change_sensor_value(body)
-    processor.cache_sensor_value(sensor_value)
+    body = json.loads(body)
+    sensor = Sensor(body['name'], body['value'])
+    processor.change_sensor_value(sensor)
+    processor.cache_sensor_value(sensor)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
