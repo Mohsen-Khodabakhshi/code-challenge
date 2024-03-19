@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from core import events
+from backend.core import events
 
 app = FastAPI()
 
@@ -10,6 +10,6 @@ async def startup_event() -> None:
     await events.startup_event_handler(app)
 
 
-@app.get("/{sensor_id}")
+@app.get("/sensor/{sensor_id}")
 def retrieve_sensor_value(sensor_id: int):
-    return {"value": app.redis.get(sensor_id)}
+    return {"value": app.redis.get(f'sensor_{sensor_id}')}

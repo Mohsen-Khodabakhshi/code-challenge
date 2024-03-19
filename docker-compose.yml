@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - services
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - services
+
+  producer:
+    container_name: producer
+    build: .
+    command: python sensors/producer.py
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - services
+
+  consumer:
+    container_name: consumer
+    build: .
+    command: python sensors/consumer.py
+    depends_on:
+      - redis
+      - rabbitmq
+      - producer
+    networks:
+      - services
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    container_name: backend
+    command: uvicorn backend.core.main:app --host 0.0.0.0 --port 8000
+    networks:
+      - services
+
+networks:
+  services:

@@ -11,7 +11,7 @@ rabbit = Rabbit()
 
 
 def send_sensor_value(sensor: Sensor, queue: str = 'sensors', routing_key: str = 'sensors') -> None:
-    rabbit.channel.queue_declare(queue, True)
+    rabbit.channel.queue_declare(queue=queue, durable=True)
 
     rabbit.channel.basic_publish(exchange='', routing_key=routing_key, body=json.dumps(asdict(sensor)),
                                  properties=pika.BasicProperties(delivery_mode=2)

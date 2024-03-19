@@ -7,7 +7,7 @@ class BaseSettings(PydanticBaseSettings):
 
 
 class RedisSettings(BaseSettings):
-    host: str = '0.0.0.0'
+    host: str = 'redis'
     port: int = 6379
     db: int = 0
 

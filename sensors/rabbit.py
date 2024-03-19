@@ -1,9 +1,13 @@
-from abc import ABC, abstractmethod
-
 import pika
+from pika.exceptions import AMQPConnectionError
 
 
-class Rabbit(ABC):
-    def __init__(self, host: str = 'localhost') -> None:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host))
-        self.channel = connection.channel()
+class Rabbit:
+    def __init__(self, host: str = 'rabbitmq') -> None:
+        while True:
+            try:
+                connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+                self.channel = connection.channel()
+                break
+            except AMQPConnectionError:
+                continue
